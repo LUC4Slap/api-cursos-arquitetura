@@ -23,17 +23,17 @@ public class UsuarioService : IUsuarioService
         _context = context;
         _incryptService = incryptService;
     }
-    public async Task<string> Login(LoginViewModelInput loginViewModel)
+    public async Task<LoginResponse> Login(LoginViewModelInput loginViewModel)
     {
         try
         {
             var usuario = _context.Usuarios.Where(x => x.Login == loginViewModel.Login).FirstOrDefault();
             
             if(usuario == null)
-                throw new Exception("Usuario no encontrado");
+                return new LoginResponse { Sucesso = false, Erros = "Usuario ou senha incorretos" };
             
             if(!_incryptService.Verify(loginViewModel.Senha, usuario.Senha))
-                throw new Exception("Senha incorreta");
+                return new LoginResponse { Sucesso = false, Erros = "Usuario ou senha incorretos" };
             
             var secret = Encoding.UTF8.GetBytes(_config["JwtConfiguration:Secret"]);
             var symetricSecurityKey = new SymmetricSecurityKey(secret);
@@ -50,7 +50,8 @@ public class UsuarioService : IUsuarioService
             };
             var jwtSecurityTokenHendler = new JwtSecurityTokenHandler();
             var tokeGenerated =  jwtSecurityTokenHendler.CreateToken(securityTokenDescriptot);
-            return jwtSecurityTokenHendler.WriteToken(tokeGenerated);
+            var token = jwtSecurityTokenHendler.WriteToken(tokeGenerated);
+            return new LoginResponse { Sucesso = true, Token = token };
         }
         catch (Exception e)
         {

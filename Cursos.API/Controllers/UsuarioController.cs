@@ -17,7 +17,7 @@ public class UsuarioController : ControllerBase
     }
     
     [HttpPost("login")]
-    [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(LoginResponse), (int)HttpStatusCode.OK)]
     [ValidacaoModelStateCustomizado]
     public async Task<IActionResult> Logar([FromBody] LoginViewModelInput  loginViewModel)
     {
@@ -27,6 +27,9 @@ public class UsuarioController : ControllerBase
                 return BadRequest(ModelState);
             
             var loginResult = await _usuarioService.Login(loginViewModel);
+            
+            if(!loginResult.Sucesso)
+                return BadRequest(loginResult);
             
             return Ok(loginResult);
         }
