@@ -1,5 +1,6 @@
 using DataBase;
 using DataBase.Entitys;
+using Microsoft.EntityFrameworkCore;
 using Models.Cursos;
 using Services.Logic.Interfaces;
 
@@ -12,12 +13,25 @@ public class CursoService : ICursosService
     {
         _context = context;
     }
-    public async Task<List<Curso>> GetCursosAsync()
+    public async Task<List<CursoResponse>> GetCursosAsync()
     {
         try
         {
-            var cursos = _context.Cursos;
-            return cursos.ToList();
+            var cursos = await _context.Cursos
+                .Include(c => c.UsuarioCursos)
+                .Select(c => new CursoResponse
+                {
+                    Id = c.Id,
+                    Nome = c.Nome,
+                    Usuarios = c.UsuarioCursos.Select(u => new UsuarioResponse
+                    {
+                        Id = u.UsuarioId,
+                        Nome = u.Usuario.Nome
+                    }).ToList()
+                })
+                .ToListAsync();
+
+            return cursos;
         }
         catch (Exception e)
         {

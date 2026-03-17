@@ -13,7 +13,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddCors();
 builder.Services.ApiConfig(config);
 builder.Services.ResolveDependencies(configuration: config);
-
+builder.Services.AddAuthorization();
+builder.Services.AddOpenApi();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

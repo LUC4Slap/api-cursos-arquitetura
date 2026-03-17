@@ -5,6 +5,6 @@ namespace Services.Logic.Interfaces;
 
 public interface ICursosService
 {
-    Task<List<Curso>> GetCursosAsync();
+    Task<List<CursoResponse>> GetCursosAsync();
     Task<bool> CadastrarAsync(CursoViewModelInput cursoViewModelInput);
 }
